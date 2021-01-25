@@ -717,7 +717,7 @@ followed by files. To mix files and folders and order them alphabetically in rev
 $ curl -X GET -H 'Accept: application/json' -H 'Authorization: Basic VElDS0VUXzA4ZWI3ZTJlMmMxNzk2NGNhNTFmMGYzMzE4NmNjMmZjOWQ1NmQ1OTM=' "http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?relativePath=My%20Stuff&orderBy=name%20DESC" | jq 
 ```
 
-## Get folder/file metadata
+## Get folder/file metadata {#getnodemetadata}
 
 Getting the metadata for a node returns the properties for the node type and applied aspects.
 

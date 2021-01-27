@@ -89,8 +89,9 @@ Content Services event data payload/attributes:
 |`data.resource.aspectNames`      |Array|[Content model]({% link content-services/latest/develop/repo-ext-points/content-model.md %}) aspects that have been applied to the node.|
 |`data.resource.isFolder`         |Boolean|`true` if this node is of type `cm:folder`.|
 |`data.resource.isFile`           |Boolean|`true` if this node is of type `cm:content`.|
-|`data.resource.resourceReaderAuthorities`|Array|Authorities that can read this resource, such as `GROUP_EVERYONE`, which means anybody can read the data.|
-|`data.resource.resourceDeniedAuthorities`|Array|Authorities that cannot access this data.|
+|`data.resource.resourceReaderAuthorities`|Array|(*Enterprise*) The authority IDs, such as `GROUP_EVERYONE`, that have READ access to the resource affected by the event. **Note**: this property will not be present in the event when `authorities generation` is disabled.|
+|`data.resource.resourceDeniedAuthorities`|Array|(*Enterprise*) The authority IDs, such as `GROUP_EVERYONE`, that are denied READ access to the resource affected by the event. **Note**: this property will not be present in the event when `authorities generation` is disabled.|
+|`data.resource.resourceReaderSecurityControls`|Array|(*Enterprise*) The Governance security controls that have been placed on the resource affected by the event. **Note**: this property is only available for AGS. Also, it will not be present in the event response when `authorities generation` is disabled or when the AGS module is not installed.|
 |`data.resourceBefore` |Object (varies)|The object representing the old values of the changed resource's attributes. Note, this object is only available on the `org.alfresco.event.node.Updated` event type.|
 
 For a detailed view of the event data refer to [Repo Event JSON schema](https://github.com/Alfresco/acs-event-model/tree/master/src/main/resources/json-schema){:target="_blank"}.
@@ -99,25 +100,32 @@ For a detailed view of the event data refer to [Repo Event JSON schema](https://
 
 The following are the different types of events that can be subscribed to:
 
-| Name                              | Description                                                      |
-|-----------------------------------|------------------------------------------------------------------|
-| `org.alfresco.event.node.Created` | Occurs when a node is created |
-| `org.alfresco.event.node.Updated` | Occurs when a node is updated or moved. Currently only node's name, type, properties, aspects, and content are supported|
-| `org.alfresco.event.node.Deleted` | Occurs when a node is deleted |
-| `org.alfresco.event.assoc.child.Created` | Occurs when a secondary child association is created |
-| `org.alfresco.event.assoc.child.Deleted` | Occurs when a secondary child association is deleted |
-| `org.alfresco.event.assoc.peer.Created` | Occurs when a peer association is created |
-| `org.alfresco.event.assoc.peer.Deleted` | Occurs when a peer association is deleted |
+|Name                              |Description                                                      |
+|----------------------------------|-----------------------------------------------------------------|
+|`org.alfresco.event.node.Created`|Occurs when a node is created.|
+|`org.alfresco.event.node.Updated`|Occurs when a node is updated or moved. Currently only node's name, type, properties, aspects, and content are supported.|
+|`org.alfresco.event.node.Deleted`|Occurs when a node is deleted.|
+|`org.alfresco.event.assoc.child.Created`|Occurs when a secondary child association is created.|
+|`org.alfresco.event.assoc.child.Deleted`|Occurs when a secondary child association is deleted.|
+|`org.alfresco.event.assoc.peer.Created`|Occurs when a peer association is created.|
+|`org.alfresco.event.assoc.peer.Deleted`|Occurs when a peer association is deleted.|
 
 ## Event descriptions
 
 Let's have a look at each event and see what we can use it for when implementing business logic for a 
 particular content domain.
 
+Content Services events are published on the [JMS Topic](http://activemq.apache.org/how-does-a-queue-compare-to-a-topic.html){:target="_blank"} 
+called `alfresco.repo.event2`. See (search) default configuration in the [repository.properties](https://github.com/Alfresco/alfresco-community-repo/blob/master/repository/src/main/resources/alfresco/repository.properties){:target="_blank"} file.
+So a Camel Route could for example be configured to pick up events from `amqpConnection:topic:alfresco.repo.event2`. The `amqpConnection` to the 
+[Active MQ](http://activemq.apache.org) endpoint in the Content Services server would then be configured to connect to `amqp://localhost:5672`.
+
 ### Node created event
 
 This event is fired whenever a node, such as a folder or file, is created in the repository. The full name of this 
-event is `org.alfresco.event.node.Created`. Here is an example payload for this event type:
+event is `org.alfresco.event.node.Created`. 
+
+Here is an example payload for this event type:
 
 ```json
 {
@@ -231,11 +239,6 @@ public class SimpleRoute extends RouteBuilder {
     }
 }
 ```
-
-Content Services events are published on the [JMS Topic](http://activemq.apache.org/how-does-a-queue-compare-to-a-topic.html){:target="_blank"} 
-called `alfresco.repo.event2`. See (search) default configuration in the [repository.properties](https://github.com/Alfresco/alfresco-community-repo/blob/master/repository/src/main/resources/alfresco/repository.properties){:target="_blank"} file.
-So the Camel Route is configured to pick up events from `amqpConnection:topic:alfresco.repo.event2`. The `amqpConnection` to the 
-[Active MQ](http://activemq.apache.org) endpoint in the Content Services server is configured to connect to `amqp://localhost:5672`.
 
 The `jsonpath` expression uses several of the event data properties to filter out exactly the events we are interested in.
 
@@ -394,12 +397,138 @@ public class SimpleRoute extends RouteBuilder {
 }
 ```
 
-Content Services events are published on the [JMS Topic](http://activemq.apache.org/how-does-a-queue-compare-to-a-topic.html){:target="_blank"} 
-called `alfresco.repo.event2`. See (search) default configuration in the [repository.properties](https://github.com/Alfresco/alfresco-community-repo/blob/master/repository/src/main/resources/alfresco/repository.properties){:target="_blank"} file.
-So the Camel Route is configured to pick up events from `amqpConnection:topic:alfresco.repo.event2`. The `amqpConnection` to the 
-[Active MQ](http://activemq.apache.org) endpoint in the Content Services server is configured to connect to `amqp://localhost:5672`.
-
 The `jsonpath` expression uses several of the event data properties to filter out exactly the events we are interested in.
 
 In this case a Spring Bean with ID `updatedEventHandlerImpl` is called at the end of the route from where you could make the 
 necessary ReST API calls.
+
+### Node deleted event
+
+This event is fired whenever a node, such as a folder or file, is deleted in the repository. The full name of this 
+event is `org.alfresco.event.node.Deleted`. 
+
+Here is an example payload for this event type:
+
+```json
+{
+  "specversion": "1.0",
+  "type": "org.alfresco.event.node.Deleted",
+  "id": "df329995-d744-427c-bafb-4a31ba7d50e3",
+  "source": "/08d9b620-48de-4247-8f33-360988d3b19b",
+  "time": "2021-01-27T10:57:02.586606Z",
+  "dataschema": "https://api.alfresco.com/schema/event/repo/v1/nodeDeleted",
+  "datacontenttype": "application/json",
+  "data": {
+    "eventGroupId": "acb8e25f-a340-48b5-8de8-249ae5bac670",
+    "resource": {
+      "@type": "NodeResource",
+      "id": "d71dd823-82c7-477c-8490-04cb0e826e65",
+      "primaryHierarchy": [
+        "5f355d16-f824-4173-bf4b-b1ec37ef5549",
+        "93f7edf5-e4d8-4749-9b4c-e45097e2e19d",
+        "c388532e-8da6-4d50-a6d2-4f3f3ac36ff7",
+        "2fa2cde5-9d83-4460-a38c-cfe4ec9cca08"
+      ],
+      "name": "purchase-order-scan.pdf",
+      "nodeType": "cm:content",
+      "createdByUser": {
+        "id": "admin",
+        "displayName": "Administrator"
+      },
+      "createdAt": "2021-01-21T11:14:15.695Z",
+      "modifiedByUser": {
+        "id": "admin",
+        "displayName": "Administrator"
+      },
+      "modifiedAt": "2021-01-26T10:29:42.529Z",
+      "content": {
+        "mimeType": "application/pdf",
+        "sizeInBytes": 531152,
+        "encoding": "UTF-8"
+      },
+      "properties": {
+        "cm:autoVersion": true,
+        "cm:title": "Purchase Order",
+        "cm:versionType": "MAJOR",
+        "cm:versionLabel": "1.0",
+        "cm:autoVersionOnUpdateProps": false,
+        "cm:lastThumbnailModification": [
+          "doclib:1611227666770"
+        ],
+        "cm:description": "",
+        "cm:taggable": null,
+        "cm:initialVersion": true
+      },
+      "aspectNames": [
+        "cm:versionable",
+        "cm:author",
+        "cm:thumbnailModification",
+        "cm:titled",
+        "rn:renditioned",
+        "cm:auditable",
+        "cm:taggable"
+      ],
+      "isFolder": false,
+      "isFile": true
+    },
+    "resourceReaderAuthorities": [],
+    "resourceDeniedAuthorities": []
+  }
+}
+```
+
+The event data payload looks very similar to the data for a created node. Using the 
+[Node Browser]({% link content-services/latest/admin/troubleshoot.md %}#usingnodebrowser) the following 
+`NodeRefs` were resolved as follows:
+
+```json
+      "id": "d71dd823-82c7-477c-8490-04cb0e826e65",   /app:company_home/cm:Testing/cm:Inbound/cm:purchase-order-scan.pdf (cm:content)
+      "primaryHierarchy": [
+        "5f355d16-f824-4173-bf4b-b1ec37ef5549",       /app:company_home/cm:Testing/cm:Inbound  (cm:folder)
+        "93f7edf5-e4d8-4749-9b4c-e45097e2e19d",       /app:company_home/cm:Testing             (cm:folder)
+        "c388532e-8da6-4d50-a6d2-4f3f3ac36ff7",       /app:company_home                        (cm:folder)
+        "2fa2cde5-9d83-4460-a38c-cfe4ec9cca08"        Store root                               (sys:store_root)
+```
+
+The event payload is telling us that a file called `purchase-order-scan.pdf` (i.e. `data.resource.name`) of type `cm:content` 
+(i.e. `data.resource.nodeType`) was deleted by the user `admin` (i.e. `data.resource.createdByUser.id`) in the 
+**/Company Home/Testing/Inbound** folder (i.e. `data.resource.primaryHierarchy[0]`). The deleted node had a Node ID 
+`d71dd823-82c7-477c-8490-04cb0e826e65` (i.e. `data.resource.id`). Note that the deleted node is soft deleted and is now
+available in the trash can.
+
+When subscribing to the `org.alfresco.event.node.Deleted` event it's possible to filter out anything that is
+of no interest. So for example, if you are interested in files with content type `cm:content` deleted in the folder 
+called **/Company Home/Testing/Inbound** (e.g. Node ID `5f355d16-f824-4173-bf4b-b1ec37ef5549`) it would be easy to 
+configure this. The following code snippet shows how this could be done with an 
+[Apache Camel route](https://camel.apache.org/manual/latest/routes.html){:target="_blank"} configuration:
+
+```java
+public class SimpleRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+        from("amqpConnection:topic:alfresco.repo.event2")
+            .id("DeletedFileRoute")
+            .log("${body}") // Log all incoming events on this topic, even those that we are not interested in
+            .choice()
+            .when() // When the following is true:
+            // The event type is node deleted
+            .jsonpath("$[?(@.type=='org.alfresco.event.node.Deleted' && " +
+                    // and the node that was deleted is a file
+                    "@.data.resource.nodeType=='cm:content' && " +
+                    // and the file is located in the /Company Home/Testing/Inbound folder
+                    "'5f355d16-f824-4173-bf4b-b1ec37ef5549' in @.data.resource.primaryHierarchy[:1])]")
+            // Unpack the data into JSON format
+            .unmarshal("publicDataFormat")
+            // Call a Spring Bean with the event data
+            .bean("deletedEventHandlerImpl", "onReceive(*, COPY)")
+            .end();
+    }
+}
+```
+
+The `jsonpath` expression uses several of the event data properties to filter out exactly the events we are interested in.
+
+In this case a Spring Bean with ID `deletedEventHandlerImpl` is called at the end of the route from where you could make the 
+necessary ReST API calls.
+

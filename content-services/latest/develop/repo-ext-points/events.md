@@ -75,7 +75,7 @@ Content Services event data payload/attributes:
 |----------------------|---------------|------------------------------------------------------------------|
 |`data.eventGroupId`   |String         |Optional unique identifier for events group, i.e. a transaction ID. Multiple nodes can be created in the same transaction.|
 |`data.resource`       |Object (varies)|The object representing the resource affected. Here the resource represents a node in the Alfresco Repository.|
-|`data.resource.@type` |String|The type of resource object, such as an Alfresco Repository `NodeResource`.|
+|`data.resource.@type` |String|The type of resource object (`NodeResource`, `ChildAssociationResource`).|
 |`data.resource.id`    |String|The Alfresco Repository Node Id for the resource (e.g. node such as folder or file) that the data represent.|
 |`data.resource.primaryHierarchy` |Array|Optional primary hierarchy of ancestors of the resource affected, i.e. folder path for the node. Note that the first element is the immediate parent.|
 |`data.resource.name`             |String|The name of the resource. This is the name of the node, e.g. the name of a folder or a file.|
@@ -532,3 +532,88 @@ The `jsonpath` expression uses several of the event data properties to filter ou
 In this case a Spring Bean with ID `deletedEventHandlerImpl` is called at the end of the route from where you could make the 
 necessary ReST API calls.
 
+### Parent-Child association created event
+
+This event is fired whenever a **secondary** parent -> child association is created, such as via the the 
+[POST nodes/{parentId}/secondary-children]({% link content-services/latest/develop/rest-api-guide/folders-files.md %}#createparentchildassoc4nodeexist)  
+ReST API. The full name of this event is `org.alfresco.event.assoc.child.Created`. 
+
+>**Note** that this event will not be generated when a file is created or a folder is created. In this case the **primary** 
+parent -> child association (i.e. `cm:contains`) is created but an event for this association is not triggered. You will 
+have to listen to the `org.alfresco.event.node.Created` event instead, and from the data for this event you can get to the 
+**primary** parent -> child association.  
+
+Here is an example payload for this event type:
+
+```json
+{
+  "specversion": "1.0",
+  "type": "org.alfresco.event.assoc.child.Created",
+  "id": "4014bcb2-f1e6-447f-8caa-3a6219bc94ad",
+  "source": "/08d9b620-48de-4247-8f33-360988d3b19b",
+  "time": "2021-01-28T13:42:34.329162Z",
+  "dataschema": "https://api.alfresco.com/schema/event/repo/v1/childAssocCreated",
+  "datacontenttype": "application/json",
+  "data": {
+    "eventGroupId": "78da21cc-fa5a-47d1-afcb-03005229efa9",
+    "resource": {
+      "@type": "ChildAssociationResource",
+      "assocType": "fdk:images",
+      "parent": {
+        "id": "a4eb7684-0ffe-4bf5-b6f7-4297a6e4ee84"
+      },
+      "child": {
+        "id": "ceb3c804-8b32-4050-b2da-b55c47f01666"    
+      }
+    }
+  }
+}
+```
+
+Using the [Node Browser]({% link content-services/latest/admin/troubleshoot.md %}#usingnodebrowser) the following 
+`NodeRefs` were resolved as follows:
+
+```json
+      "parent": {
+        "id": "a4eb7684-0ffe-4bf5-b6f7-4297a6e4ee84"  /app:company_home/cm:My_x0020_Gadgets/cm:My_x0020_Gadget  
+      },
+      "child": {
+        "id": "ceb3c804-8b32-4050-b2da-b55c47f01666"  /app:company_home/cm:My_x0020_Gadgets/cm:gadget-picture.png
+```
+
+The event payload is telling us that a secondary parent-child association of type `fdk:images` (i.e. `data.resource.assocType`) 
+was set up between a gadget file `My Gadget` (i.e. `data.resource.parent`) and a gadget image `gadget-picture.png` 
+(i.e. `data.resource.child`).
+
+When subscribing to the `org.alfresco.event.assoc.child.Created` event it's possible to filter out anything that is
+of no interest. So for example, if you are only interested in associations of type `fdk:images` it would be easy to 
+configure this. The following code snippet shows how this could be done with an 
+[Apache Camel route](https://camel.apache.org/manual/latest/routes.html){:target="_blank"} configuration:
+
+```java
+public class SimpleRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+        from("amqpConnection:topic:alfresco.repo.event2")
+            .id("ParentChildAssocCreatedRoute")
+            .log("${body}") // Log all incoming events on this topic, even those that we are not interested in
+            .choice()
+            .when() // When the following is true:
+            // The event type is parent-child assoc created
+            .jsonpath("$[?(@.type=='org.alfresco.event.assoc.child.Created' && " +
+                    // and the association type is fdk:images
+                    "@.data.resource.assocType=='fdk:images')]" )
+            // Unpack the data into JSON format
+            .unmarshal("publicDataFormat")
+            // Call a Spring Bean with the event data
+            .bean("parentChildAssocCreatedEventHandlerImpl", "onReceive(*, COPY)")
+            .end();
+    }
+}
+```
+
+The `jsonpath` expression uses several of the event data properties to filter out exactly the events we are interested in.
+
+In this case a Spring Bean with ID `parentChildAssocCreatedEventHandlerImpl` is called at the end of the route from 
+where you could make the necessary ReST API calls.

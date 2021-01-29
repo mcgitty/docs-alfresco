@@ -3689,7 +3689,7 @@ $ curl -X GET -H 'Accept: application/json' -H 'Authorization: Basic VElDS0VUXzA
 }
 ```
 
-### Create an association for a node that exists
+### Create an association for a node that exists {#createparentchildassoc4nodeexist}
 
 It's also possible to create associations on nodes that already exist, let's add some more to our "My Gadget" `fdk:gadget` 
 node. Before we do that though upload another image to the “My Gadgets” folder and some more content to represent another 

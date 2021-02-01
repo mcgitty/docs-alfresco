@@ -617,3 +617,92 @@ The `jsonpath` expression uses several of the event data properties to filter ou
 
 In this case a Spring Bean with ID `parentChildAssocCreatedEventHandlerImpl` is called at the end of the route from 
 where you could make the necessary ReST API calls.
+
+### Parent-Child association deleted event
+
+This event is fired whenever a **secondary** parent -> child association is deleted, such as via the the 
+[DELETE nodes/{parentId}/secondary-children/{assocID}?assocType={assocType}']({% link content-services/latest/develop/rest-api-guide/folders-files.md %}##deletingassociations)  
+ReST API. The full name of this event is `org.alfresco.event.assoc.child.Deleted`. 
+
+>**Note** that this event will not be generated when a file is deleted or a folder is deleted. In this case the **primary** 
+parent -> child association (i.e. `cm:contains`) is deleted but an event for this association is not triggered. You will 
+have to listen to the `org.alfresco.event.node.Deleted` event instead, and from the data for this event you can get data for 
+the deleted **primary** parent -> child association.  
+
+Here is an example payload for this event type:
+
+```json
+{
+  "specversion": "1.0",
+  "type": "org.alfresco.event.assoc.peer.Deleted",
+  "id": "630a2b78-5832-42ad-89e0-bafaed73df3d",
+  "source": "/08d9b620-48de-4247-8f33-360988d3b19b",
+  "time": "2021-02-01T10:39:37.329006Z",
+  "dataschema": "https://api.alfresco.com/schema/event/repo/v1/peerAssocDeleted",
+  "datacontenttype": "application/json",
+  "data": {
+    "eventGroupId": "27e7f158-707b-48ee-87ca-efd247e6cbb7",
+    "resource": {
+      "@type": "PeerAssociationResource",
+      "assocType": "fdk:reviews",
+      "source": {
+        "id": "a4eb7684-0ffe-4bf5-b6f7-4297a6e4ee84"
+      },
+      "target": {
+        "id": "f826ac49-0262-48af-8f63-f87eb7007078"
+      }
+    }
+  }
+}
+```
+
+Using the [Node Browser]({% link content-services/latest/admin/troubleshoot.md %}#usingnodebrowser) the following 
+`NodeRefs` were resolved as follows:
+
+```json
+      "parent": {
+        "id": "a4eb7684-0ffe-4bf5-b6f7-4297a6e4ee84"  /app:company_home/cm:My_x0020_Gadgets/cm:My_x0020_Gadget  
+      },
+      "child": {
+        "id": "f826ac49-0262-48af-8f63-f87eb7007078"  /sys:archivedItem/gadget-review.txt
+```
+
+The event payload is telling us that a secondary parent-child association of type `fdk:reviews` (i.e. `data.resource.assocType`) 
+was deleted between a gadget file `My Gadget` (i.e. `data.resource.parent`) and a gadget review `gadget-review.txt` 
+(i.e. `data.resource.child`).
+
+>**Note**. when you use the Node Browser to look for the deleted `gadget-review.txt` file (i.e. with ID f826ac49-0262-48af-8f63-f87eb7007078) 
+you have to search in the `archive://SpacesStore` store to find it. This store contains soft deleted files. 
+
+When subscribing to the `org.alfresco.event.assoc.child.Deleted` event it's possible to filter out anything that is
+of no interest. So for example, if you are only interested in associations of type `fdk:reviews` it would be easy to 
+configure this. The following code snippet shows how this could be done with an 
+[Apache Camel route](https://camel.apache.org/manual/latest/routes.html){:target="_blank"} configuration:
+
+```java
+public class SimpleRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+        from("amqpConnection:topic:alfresco.repo.event2")
+            .id("ParentChildAssocDeletedRoute")
+            .log("${body}") // Log all incoming events on this topic, even those that we are not interested in
+            .choice()
+            .when() // When the following is true:
+            // The event type is parent-child assoc deleted
+            .jsonpath("$[?(@.type=='org.alfresco.event.assoc.child.Deleted' && " +
+                    // and the association type is fdk:reviews
+                    "@.data.resource.assocType=='fdk:reviews')]" )
+            // Unpack the data into JSON format
+            .unmarshal("publicDataFormat")
+            // Call a Spring Bean with the event data
+            .bean("parentChildAssocDeletedEventHandlerImpl", "onReceive(*, COPY)")
+            .end();
+    }
+}
+```
+
+The `jsonpath` expression uses several of the event data properties to filter out exactly the events we are interested in.
+
+In this case a Spring Bean with ID `parentChildAssocDeletedEventHandlerImpl` is called at the end of the route from 
+where you could make the necessary ReST API calls.

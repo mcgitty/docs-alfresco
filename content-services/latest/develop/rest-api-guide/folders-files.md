@@ -3816,7 +3816,7 @@ $ curl -X GET -H 'Accept: application/json' -H 'Authorization: Basic VElDS0VUXzA
 }
 ```
 
-### Deleting associations
+### Deleting associations {#deletingassociations}
 
 The last thing to cover is deleting associations, let's start by removing the second review from our `fdk:gadget` node. 
 To do this we send a DELETE request to:

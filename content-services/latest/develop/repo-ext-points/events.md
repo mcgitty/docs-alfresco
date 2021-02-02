@@ -105,8 +105,8 @@ The following are the different types of events that can be subscribed to:
 |`org.alfresco.event.node.Created`|Occurs when a node is created.|
 |`org.alfresco.event.node.Updated`|Occurs when a node is updated or moved. Currently only node's name, type, properties, aspects, and content are supported.|
 |`org.alfresco.event.node.Deleted`|Occurs when a node is deleted.|
-|`org.alfresco.event.assoc.child.Created`|Occurs when a secondary child association is created.|
-|`org.alfresco.event.assoc.child.Deleted`|Occurs when a secondary child association is deleted.|
+|`org.alfresco.event.assoc.child.Created`|Occurs when a secondary child association is created.<br><br>**Note.** This event is not triggered for `cm:contains` primary parent-child associations. I.e. when a file or folder is created.|
+|`org.alfresco.event.assoc.child.Deleted`|Occurs when a secondary child association is deleted.<br><br>**Note.** This event is not triggered for `cm:contains` primary parent-child associations. I.e. when a file or folder is deleted.|
 |`org.alfresco.event.assoc.peer.Created`|Occurs when a peer association is created.|
 |`org.alfresco.event.assoc.peer.Deleted`|Occurs when a peer association is deleted.|
 
@@ -190,12 +190,12 @@ Using the [Node Browser]({% link content-services/latest/admin/troubleshoot.md %
 `NodeRefs` were resolved as follows:
 
 ```json
-      "id": "d71dd823-82c7-477c-8490-04cb0e826e65",   /app:company_home/cm:Testing/cm:Inbound/cm:purchase-order-scan.pdf (cm:content)
-      "primaryHierarchy": [
-        "5f355d16-f824-4173-bf4b-b1ec37ef5549",       /app:company_home/cm:Testing/cm:Inbound  (cm:folder)
-        "93f7edf5-e4d8-4749-9b4c-e45097e2e19d",       /app:company_home/cm:Testing             (cm:folder)
-        "c388532e-8da6-4d50-a6d2-4f3f3ac36ff7",       /app:company_home                        (cm:folder)
-        "2fa2cde5-9d83-4460-a38c-cfe4ec9cca08"        Store root                               (sys:store_root)
+  "id": "d71dd823-82c7-477c-8490-04cb0e826e65",   /app:company_home/cm:Testing/cm:Inbound/cm:purchase-order-scan.pdf (cm:content)
+  "primaryHierarchy": [
+    "5f355d16-f824-4173-bf4b-b1ec37ef5549",       /app:company_home/cm:Testing/cm:Inbound  (cm:folder)
+    "93f7edf5-e4d8-4749-9b4c-e45097e2e19d",       /app:company_home/cm:Testing             (cm:folder)
+    "c388532e-8da6-4d50-a6d2-4f3f3ac36ff7",       /app:company_home                        (cm:folder)
+    "2fa2cde5-9d83-4460-a38c-cfe4ec9cca08"        Store root                               (sys:store_root)
 ```
 
 The event payload is telling us that a file called `purchase-order-scan.pdf` (i.e. `data.resource.name`) of type `cm:content` 
@@ -348,12 +348,12 @@ Using the [Node Browser]({% link content-services/latest/admin/troubleshoot.md %
 `NodeRefs` were resolved as follows:
 
 ```json
-      "id": "d71dd823-82c7-477c-8490-04cb0e826e65",   /app:company_home/cm:Testing/cm:Inbound/cm:purchase-order-scan.pdf (cm:content)
-      "primaryHierarchy": [
-        "5f355d16-f824-4173-bf4b-b1ec37ef5549",       /app:company_home/cm:Testing/cm:Inbound  (cm:folder)
-        "93f7edf5-e4d8-4749-9b4c-e45097e2e19d",       /app:company_home/cm:Testing             (cm:folder)
-        "c388532e-8da6-4d50-a6d2-4f3f3ac36ff7",       /app:company_home                        (cm:folder)
-        "2fa2cde5-9d83-4460-a38c-cfe4ec9cca08"        Store root                               (sys:store_root)
+  "id": "d71dd823-82c7-477c-8490-04cb0e826e65",   /app:company_home/cm:Testing/cm:Inbound/cm:purchase-order-scan.pdf (cm:content)
+  "primaryHierarchy": [
+    "5f355d16-f824-4173-bf4b-b1ec37ef5549",       /app:company_home/cm:Testing/cm:Inbound  (cm:folder)
+    "93f7edf5-e4d8-4749-9b4c-e45097e2e19d",       /app:company_home/cm:Testing             (cm:folder)
+    "c388532e-8da6-4d50-a6d2-4f3f3ac36ff7",       /app:company_home                        (cm:folder)
+    "2fa2cde5-9d83-4460-a38c-cfe4ec9cca08"        Store root                               (sys:store_root)
 ```
 
 The event payload is telling us that a file called `purchase-order-scan.pdf` (i.e. `data.resource.name`) of type `cm:content` 
@@ -482,12 +482,12 @@ The event data payload looks very similar to the data for a created node. Using 
 `NodeRefs` were resolved as follows:
 
 ```json
-      "id": "d71dd823-82c7-477c-8490-04cb0e826e65",   /app:company_home/cm:Testing/cm:Inbound/cm:purchase-order-scan.pdf (cm:content)
-      "primaryHierarchy": [
-        "5f355d16-f824-4173-bf4b-b1ec37ef5549",       /app:company_home/cm:Testing/cm:Inbound  (cm:folder)
-        "93f7edf5-e4d8-4749-9b4c-e45097e2e19d",       /app:company_home/cm:Testing             (cm:folder)
-        "c388532e-8da6-4d50-a6d2-4f3f3ac36ff7",       /app:company_home                        (cm:folder)
-        "2fa2cde5-9d83-4460-a38c-cfe4ec9cca08"        Store root                               (sys:store_root)
+  "id": "d71dd823-82c7-477c-8490-04cb0e826e65",   /app:company_home/cm:Testing/cm:Inbound/cm:purchase-order-scan.pdf (cm:content)
+  "primaryHierarchy": [
+    "5f355d16-f824-4173-bf4b-b1ec37ef5549",       /app:company_home/cm:Testing/cm:Inbound  (cm:folder)
+    "93f7edf5-e4d8-4749-9b4c-e45097e2e19d",       /app:company_home/cm:Testing             (cm:folder)
+    "c388532e-8da6-4d50-a6d2-4f3f3ac36ff7",       /app:company_home                        (cm:folder)
+    "2fa2cde5-9d83-4460-a38c-cfe4ec9cca08"        Store root                               (sys:store_root)
 ```
 
 The event payload is telling us that a file called `purchase-order-scan.pdf` (i.e. `data.resource.name`) of type `cm:content` 
@@ -574,11 +574,11 @@ Using the [Node Browser]({% link content-services/latest/admin/troubleshoot.md %
 `NodeRefs` were resolved as follows:
 
 ```json
-      "parent": {
-        "id": "a4eb7684-0ffe-4bf5-b6f7-4297a6e4ee84"  /app:company_home/cm:My_x0020_Gadgets/cm:My_x0020_Gadget  
-      },
-      "child": {
-        "id": "ceb3c804-8b32-4050-b2da-b55c47f01666"  /app:company_home/cm:My_x0020_Gadgets/cm:gadget-picture.png
+  "parent": {
+    "id": "a4eb7684-0ffe-4bf5-b6f7-4297a6e4ee84"  /app:company_home/cm:My_x0020_Gadgets/cm:My_x0020_Gadget  
+  },
+  "child": {
+    "id": "ceb3c804-8b32-4050-b2da-b55c47f01666"  /app:company_home/cm:My_x0020_Gadgets/cm:gadget-picture.png
 ```
 
 The event payload is telling us that a secondary parent-child association of type `fdk:images` (i.e. `data.resource.assocType`) 
@@ -621,13 +621,179 @@ where you could make the necessary ReST API calls.
 ### Parent-Child association deleted event
 
 This event is fired whenever a **secondary** parent -> child association is deleted, such as via the the 
-[DELETE nodes/{parentId}/secondary-children/{assocID}?assocType={assocType}']({% link content-services/latest/develop/rest-api-guide/folders-files.md %}##deletingassociations)  
+[DELETE nodes/{parentId}/secondary-children]({% link content-services/latest/develop/rest-api-guide/folders-files.md %}##deletingassociations)  
 ReST API. The full name of this event is `org.alfresco.event.assoc.child.Deleted`. 
 
 >**Note** that this event will not be generated when a file is deleted or a folder is deleted. In this case the **primary** 
 parent -> child association (i.e. `cm:contains`) is deleted but an event for this association is not triggered. You will 
 have to listen to the `org.alfresco.event.node.Deleted` event instead, and from the data for this event you can get data for 
 the deleted **primary** parent -> child association.  
+
+Here is an example payload for this event type:
+
+```json
+{
+  "specversion": "1.0",
+  "type": "org.alfresco.event.assoc.child.Deleted",
+  "id": "80a8b1db-9bac-4f20-8273-025bc555ba61",
+  "source": "/08d9b620-48de-4247-8f33-360988d3b19b",
+  "time": "2021-02-01T16:39:56.583965Z",
+  "dataschema": "https://api.alfresco.com/schema/event/repo/v1/childAssocDeleted",
+  "datacontenttype": "application/json",
+  "data": {
+    "eventGroupId": "3c53ff93-9a7c-4275-ac17-7bb2b7413f53",
+    "resource": {
+      "@type": "ChildAssociationResource",
+      "assocType": "fdk:images",
+      "parent": {
+        "id": "a4eb7684-0ffe-4bf5-b6f7-4297a6e4ee84"
+      },
+      "child": {
+        "id": "ceb3c804-8b32-4050-b2da-b55c47f01666"
+      }
+    }
+  }
+}
+```
+
+Using the [Node Browser]({% link content-services/latest/admin/troubleshoot.md %}#usingnodebrowser) the following 
+`NodeRefs` were resolved as follows:
+
+```json
+  "parent": {
+    "id": "a4eb7684-0ffe-4bf5-b6f7-4297a6e4ee84"  /app:company_home/cm:My_x0020_Gadgets/cm:My_x0020_Gadget  
+  },
+  "child": {
+    "id": "ceb3c804-8b32-4050-b2da-b55c47f01666"  /sys:archivedItem/gadget-picture.png
+```
+
+The event payload is telling us that a secondary parent-child association of type `fdk:images` (i.e. `data.resource.assocType`) 
+was deleted between a gadget file `My Gadget` (i.e. `data.resource.parent`) and a gadget review `gadget-picture.png` 
+(i.e. `data.resource.child`).
+
+>**Note**. when you use the Node Browser to look for the deleted `gadget-picture.png` file (i.e. with ID ceb3c804-8b32-4050-b2da-b55c47f01666) 
+you have to search in the `archive://SpacesStore` store to find it. This store contains soft deleted files. 
+
+When subscribing to the `org.alfresco.event.assoc.child.Deleted` event it's possible to filter out anything that is
+of no interest. So for example, if you are only interested in associations of type `fdk:images` it would be easy to 
+configure this. The following code snippet shows how this could be done with an 
+[Apache Camel route](https://camel.apache.org/manual/latest/routes.html){:target="_blank"} configuration:
+
+```java
+public class SimpleRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+        from("amqpConnection:topic:alfresco.repo.event2")
+            .id("ParentChildAssocDeletedRoute")
+            .log("${body}") // Log all incoming events on this topic, even those that we are not interested in
+            .choice()
+            .when() // When the following is true:
+            // The event type is parent-child assoc deleted
+            .jsonpath("$[?(@.type=='org.alfresco.event.assoc.child.Deleted' && " +
+                    // and the association type is fdk:images
+                    "@.data.resource.assocType=='fdk:images')]" )
+            // Unpack the data into JSON format
+            .unmarshal("publicDataFormat")
+            // Call a Spring Bean with the event data
+            .bean("parentChildAssocDeletedEventHandlerImpl", "onReceive(*, COPY)")
+            .end();
+    }
+}
+```
+
+The `jsonpath` expression uses several of the event data properties to filter out exactly the events we are interested in.
+
+In this case a Spring Bean with ID `parentChildAssocDeletedEventHandlerImpl` is called at the end of the route from 
+where you could make the necessary ReST API calls.
+
+### Peer association created event
+
+This event is fired whenever a peer association is created, such as via the the 
+[POST nodes/{sourceId}/targets]({% link content-services/latest/develop/rest-api-guide/folders-files.md %}#createparentchildassoc4nodeexist)  
+ReST API. The full name of this event is `org.alfresco.event.assoc.peer.Created`. 
+
+Here is an example payload for this event type:
+
+```json
+{
+  "specversion": "1.0",
+  "type": "org.alfresco.event.assoc.peer.Created",
+  "id": "8a8113a2-fa67-4914-9ecb-2ec47c456159",
+  "source": "/08d9b620-48de-4247-8f33-360988d3b19b",
+  "time": "2021-01-28T13:42:34.352956Z",
+  "dataschema": "https://api.alfresco.com/schema/event/repo/v1/peerAssocCreated",
+  "datacontenttype": "application/json",
+  "data": {
+    "eventGroupId": "78da21cc-fa5a-47d1-afcb-03005229efa9",
+    "resource": {
+      "@type": "PeerAssociationResource",
+      "assocType": "fdk:reviews",
+      "source": {
+        "id": "a4eb7684-0ffe-4bf5-b6f7-4297a6e4ee84"
+      },
+      "target": {
+        "id": "f826ac49-0262-48af-8f63-f87eb7007078"
+      }
+    }
+  }
+}
+```
+
+Using the [Node Browser]({% link content-services/latest/admin/troubleshoot.md %}#usingnodebrowser) the following 
+`NodeRefs` were resolved as follows:
+
+```json
+  "source": {
+    "id": "a4eb7684-0ffe-4bf5-b6f7-4297a6e4ee84"  /app:company_home/cm:My_x0020_Gadgets/cm:My_x0020_Gadget
+  },
+  "target": {
+    "id": "f826ac49-0262-48af-8f63-f87eb7007078"  /app:company_home/cm:My_x0020_Gadgets/cm:gadget-review.txt
+
+```
+
+The event payload is telling us that a peer association of type `fdk:reviews` (i.e. `data.resource.assocType`) 
+was set up between a gadget file `My Gadget` (i.e. `data.resource.source`) and a gadget review `gadget-review.txt` 
+(i.e. `data.resource.target`).
+
+When subscribing to the `org.alfresco.event.assoc.peer.Created` event it's possible to filter out anything that is
+of no interest. So for example, if you are only interested in associations of type `fdk:reviews` it would be easy to 
+configure this. The following code snippet shows how this could be done with an 
+[Apache Camel route](https://camel.apache.org/manual/latest/routes.html){:target="_blank"} configuration:
+
+```java
+public class SimpleRoute extends RouteBuilder {
+
+    @Override
+    public void configure() {
+        from("amqpConnection:topic:alfresco.repo.event2")
+            .id("PeerAssocCreatedRoute")
+            .log("${body}") // Log all incoming events on this topic, even those that we are not interested in
+            .choice()
+            .when() // When the following is true:
+            // The event type is peer assoc created
+            .jsonpath("$[?(@.type=='org.alfresco.event.assoc.peer.Created' && " +
+                    // and the association type is fdk:reviews
+                    "@.data.resource.assocType=='fdk:reviews')]" )
+            // Unpack the data into JSON format
+            .unmarshal("publicDataFormat")
+            // Call a Spring Bean with the event data
+            .bean("peerAssocCreatedEventHandlerImpl", "onReceive(*, COPY)")
+            .end();
+    }
+}
+```
+
+The `jsonpath` expression uses several of the event data properties to filter out exactly the events we are interested in.
+
+In this case a Spring Bean with ID `peerAssocCreatedEventHandlerImpl` is called at the end of the route from 
+where you could make the necessary ReST API calls.
+
+### Peer association deleted event
+
+This event is fired whenever a peer association is deleted, such as via the the 
+[DELETE nodes/{sourceId}/targets]({% link content-services/latest/develop/rest-api-guide/folders-files.md %}##deletingassociations)  
+ReST API. The full name of this event is `org.alfresco.event.assoc.peer.Deleted`. 
 
 Here is an example payload for this event type:
 
@@ -660,21 +826,21 @@ Using the [Node Browser]({% link content-services/latest/admin/troubleshoot.md %
 `NodeRefs` were resolved as follows:
 
 ```json
-      "parent": {
-        "id": "a4eb7684-0ffe-4bf5-b6f7-4297a6e4ee84"  /app:company_home/cm:My_x0020_Gadgets/cm:My_x0020_Gadget  
-      },
-      "child": {
-        "id": "f826ac49-0262-48af-8f63-f87eb7007078"  /sys:archivedItem/gadget-review.txt
+  "source": {
+    "id": "a4eb7684-0ffe-4bf5-b6f7-4297a6e4ee84"  /app:company_home/cm:My_x0020_Gadgets/cm:My_x0020_Gadget  
+  },
+  "target": {
+    "id": "f826ac49-0262-48af-8f63-f87eb7007078"  /sys:archivedItem/gadget-review.txt
 ```
 
-The event payload is telling us that a secondary parent-child association of type `fdk:reviews` (i.e. `data.resource.assocType`) 
-was deleted between a gadget file `My Gadget` (i.e. `data.resource.parent`) and a gadget review `gadget-review.txt` 
-(i.e. `data.resource.child`).
+The event payload is telling us that a peer association of type `fdk:reviews` (i.e. `data.resource.assocType`) 
+was deleted between a gadget file `My Gadget` (i.e. `data.resource.source`) and a gadget review `gadget-review.txt` 
+(i.e. `data.resource.target`).
 
 >**Note**. when you use the Node Browser to look for the deleted `gadget-review.txt` file (i.e. with ID f826ac49-0262-48af-8f63-f87eb7007078) 
 you have to search in the `archive://SpacesStore` store to find it. This store contains soft deleted files. 
 
-When subscribing to the `org.alfresco.event.assoc.child.Deleted` event it's possible to filter out anything that is
+When subscribing to the `org.alfresco.event.assoc.peer.Deleted` event it's possible to filter out anything that is
 of no interest. So for example, if you are only interested in associations of type `fdk:reviews` it would be easy to 
 configure this. The following code snippet shows how this could be done with an 
 [Apache Camel route](https://camel.apache.org/manual/latest/routes.html){:target="_blank"} configuration:
@@ -685,18 +851,18 @@ public class SimpleRoute extends RouteBuilder {
     @Override
     public void configure() {
         from("amqpConnection:topic:alfresco.repo.event2")
-            .id("ParentChildAssocDeletedRoute")
+            .id("PeerAssocDeletedRoute")
             .log("${body}") // Log all incoming events on this topic, even those that we are not interested in
             .choice()
             .when() // When the following is true:
-            // The event type is parent-child assoc deleted
-            .jsonpath("$[?(@.type=='org.alfresco.event.assoc.child.Deleted' && " +
+            // The event type is peer assoc deleted
+            .jsonpath("$[?(@.type=='org.alfresco.event.assoc.peer.Deleted' && " +
                     // and the association type is fdk:reviews
                     "@.data.resource.assocType=='fdk:reviews')]" )
             // Unpack the data into JSON format
             .unmarshal("publicDataFormat")
             // Call a Spring Bean with the event data
-            .bean("parentChildAssocDeletedEventHandlerImpl", "onReceive(*, COPY)")
+            .bean("peerAssocDeletedEventHandlerImpl", "onReceive(*, COPY)")
             .end();
     }
 }
@@ -704,5 +870,5 @@ public class SimpleRoute extends RouteBuilder {
 
 The `jsonpath` expression uses several of the event data properties to filter out exactly the events we are interested in.
 
-In this case a Spring Bean with ID `parentChildAssocDeletedEventHandlerImpl` is called at the end of the route from 
+In this case a Spring Bean with ID `peerAssocDeletedEventHandlerImpl` is called at the end of the route from 
 where you could make the necessary ReST API calls.

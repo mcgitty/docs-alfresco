@@ -8,7 +8,7 @@ can be implemented in an external process separate from the Content Services ser
 
 Architecture Information: [Platform Architecture]({% link content-services/latest/develop/software-architecture.md %}#platformarch)
 
-## Event Model
+## Event Model {#eventmodel}
 
 The event model in Content Services is a library packaged as a JAR file, which is part of the repository (i.e. `alfresco.war`). 
 The library contains the event model and the databind helpers used to help the clients to marshall and unmarshall the events.
@@ -109,6 +109,8 @@ The following are the different types of events that can be subscribed to:
 |`org.alfresco.event.assoc.child.Deleted`|Occurs when a secondary child association is deleted.<br><br>**Note.** This event is not triggered for `cm:contains` primary parent-child associations. I.e. when a file or folder is deleted.|
 |`org.alfresco.event.assoc.peer.Created`|Occurs when a peer association is created.|
 |`org.alfresco.event.assoc.peer.Deleted`|Occurs when a peer association is deleted.|
+
+TODO: OnPermissionUpdatedEventHandler (Enterprise)
 
 ## Event descriptions
 
@@ -872,3 +874,7 @@ The `jsonpath` expression uses several of the event data properties to filter ou
 
 In this case a Spring Bean with ID `peerAssocDeletedEventHandlerImpl` is called at the end of the route from 
 where you could make the necessary ReST API calls.
+
+### Permission updated event (ENTERPRISE)
+
+TODO

@@ -71,30 +71,31 @@ and it is explained in detail [here]({% link content-services/latest/develop/rep
 
 ### Event Handling Library
 
-The event handling library is a core component of the Java Event API that offers a set of pre-defined event handling 
+The event handling library is a core component of the Alfresco Java Event API that offers a set of pre-defined event handling 
 interfaces and the classes required to properly work with them. The idea of this library is to ease the implementation of 
-behaviours that must be triggered as a response to an event.
+business logic that must be executed as a response to an Alfresco repository event.
 
 This component is defined in the module [alfresco-java-event-api-handling](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling){:target="_blank"}. 
-The classes and interfaces of this library where designed to be as Java technology agnostic as possible. They offer the 
+The classes and interfaces of this library were designed to be as Java technology agnostic as possible. They offer the 
 plain event handling functionality doing no assumptions about the technology used to make them work together. They're 
 mostly plain Java classes, so the integrator can use them in a Spring project, a Dagger project or any other technology.
 
 The main four items in this library are explained in the next sections.
 
-#### Event Handler
+#### Event Handler {#eventhandler}
 
-The [`EventHandler`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/handler/EventHandler.java){:target="_blank"} interface defines the 
-contract of each implementation of a behaviour to be triggered as a reaction to an event.
+The [`EventHandler`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/handler/EventHandler.java){:target="_blank"} 
+interface defines the contract for an Alfresco repository event handler implementation.
 
 This contract has been reduced to a minimum:
 
 * The **type** of event the handler will manage.
-* Other conditions, called **filters**, the event must match to be handled (default to none). See [Event Filter](#event-filter).
-* The **code** to execute when the event is triggered.
+* Other conditions, called **filters**, the event must match to be handled (default to none). See [Event Filter](#eventfilter).
+* The **code** to execute when the event is triggered. The business logic implementation for your domain.
 
 A hierarchy of interfaces that extend [`EventHandler`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/handler/EventHandler.java){:target="_blank"} 
-have been defined to cover the different types of events that can be triggered by the API:
+have been defined to cover the different types of Alfresco repository events that can be triggered by the 
+Content Services event system:
  
 * Node created - [`OnNodeCreatedEventHandler`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/handler/OnNodeCreatedEventHandler.java){:target="_blank"}.
 * Node updated - [`OnNodeUpdatedEventHandler`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/handler/OnNodeUpdatedEventHandler.java){:target="_blank"}.
@@ -107,35 +108,51 @@ have been defined to cover the different types of events that can be triggered b
 
 #### Event Handling Registry
 
-[`EventHandlingRegistry`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/EventHandlingRegistry.java){:target="_blank"} is a class that 
-registers the [`EventHandler`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/handler/EventHandler.java){:target="_blank"}'s that must be 
-executed in response to each event type.
+The [`EventHandlingRegistry`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/EventHandlingRegistry.java){:target="_blank"} 
+is a class that registers the [`EventHandler`s](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/handler/EventHandler.java){:target="_blank"} 
+that must be executed in response to each repository event type.
 
 #### Event Handling Executor
 
-[`EventHandlingExecutor`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/EventHandlingExecutor.java){:target="_blank"} is an interface
-that defines the process to execute the event handlers when events are received.
+The [`EventHandlingExecutor`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/EventHandlingExecutor.java){:target="_blank"} 
+is an interface that defines the process to execute the event handlers when events are received.
 
 Currently, there is only one implementation ([`SimpleEventHandlingExecutor`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/SimpleEventHandlingExecutor.java){:target="_blank"})
 of this interface that simply uses the [`EventHandlingRegistry`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/EventHandlingRegistry.java){:target="_blank"}
-to get the list of [`EventHandler`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/handler/EventHandler.java){:target="_blank"}'s to execute
-when a specific event is triggered and executes them synchronously one by one. 
+to get the list of [`EventHandler`s](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/handler/EventHandler.java){:target="_blank"} 
+to execute when a specific repository event is triggered and executes them synchronously one by one. 
 
-#### Event Filter
+#### Event Filter {#eventfilter}
 
-[`EventFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/EventFilter.java){:target="_blank"} is an interface that defines the
-contract that must be fulfilled by an event. It is basically a predicate interface that allows the integrator to easily define conditions that must match an
-event.
+Event filters can be used in the [Event Handlers](#eventhandler) to narrow down the conditions required to execute the 
+business logic (i.e. the code) in response to a repository event being triggered.
 
-The SDK offers a basic set of implementations of the [`EventFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/EventFilter.java){:target="_blank"}
-covering the most common use cases that can be tackled by a handler (i.e. [`PropertyChangedFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/PropertyChangedFilter.java){:target="_blank"} 
-or [`ContentAddedFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/ContentAddedFilter.java)){:target="_blank"}.
+The [`EventFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/EventFilter.java){:target="_blank"} 
+is an interface that defines the contract that must be fulfilled by a repository event. It is basically a predicate 
+interface that allows the developer to easily define conditions that an event must match for the code to be executed.
 
-The integrator can create new custom event filters, as complex as required, and can use the logical operation of the [`EventFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/EventFilter.java){:target="_blank"}
+A number of filter implementations are offered out-of-the-box, covering the most common use cases:
+
+* [`IsFileFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/IsFileFilter.java){:target="_blank"} - checks if an event corresponds to a repository node of type `cm:content` or subtype (i.e. a file).
+* [`IsFolderFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/IsFolderFilter.java){:target="_blank"} - checks if an event corresponds to a repository node of type `cm:folder` or subtype (i.e. a folder).
+* [`ContentAddedFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/ContentAddedFilter.java){:target="_blank"} - checks if an event represents the addition of content (i.e. a file) to an existing `cm:content` node in the repository.
+* [`ContentChangedFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/ContentChangedFilter.java){:target="_blank"} - checks if an event represents a content update (i.e. file updated) of a `cm:content` node in the repository.
+* [`PropertyAddedFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/PropertyAddedFilter.java){:target="_blank"} - checks if an event corresponds to the addition of a node property in the repository.
+* [`PropertyChangedFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/PropertyChangedFilter.java){:target="_blank"} - checks if an event corresponds to the update of a node property in the repository.
+* [`PropertyValueFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/PropertyValueFilter.java){:target="_blank"} - checks if an event represents a node with a specific property with a specific value.
+* [`NodeAspectFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/NodeAspectFilter.java){:target="_blank"} - checks if an event represents a node with an specific aspect.
+* [`NodeMovedFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/NodeMovedFilter.java){:target="_blank"} - checks if an event represents a node being moved in the repository.
+* [`NodeTypeChangedFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/NodeTypeChangedFilter.java){:target="_blank"} - checks if an event represents the change of the type of a node in the repository.
+* [`NodeTypeFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/NodeTypeFilter.java){:target="_blank"} - checks if an event represents a node with a specific type.
+* [`AssocTypeFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/AssocTypeFilter.java){:target="_blank"} - checks if an event corresponds to a specific association type. This doesn't distinguish if the event is representing a peer-peer or parent-child association.
+* [`MimeTypeFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/MimeTypeFilter.java){:target="_blank"} - checks if an event represents a content node (i.e. `cm:content`) with a specific mime-type. 
+
+The developer can create new custom event filters, as complex as required, and can use the logical operation of the 
+[`EventFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/EventFilter.java){:target="_blank"}
 interface to combine several simpler filters in any way.
 
-For instance, you can create a filter to react to an event related to the modification of the title of a content of type `cm:content` with a mime-type of 
-`text/html` this way:
+For instance, you can create a filter to react to an event related to the modification of the title of a content of 
+type `cm:content` with a mime-type of `text/html` this way:
 
 ```java
 PropertyChangedFilter.of("cm:title")
@@ -143,32 +160,36 @@ PropertyChangedFilter.of("cm:title")
     .and(MimeTypeFilter.of("text/html"))
 ```
 
+
+TODO: ContentAddedFilter - check if this works, what if you just update a property, will this still be triggered?
+
 ### Spring Integration Tooling Library
 
-The Spring Integration tooling library component offers some utility classes that ease the handling of Alfresco events in the context of a Spring Integration 
-application.  
+The Spring Integration tooling library component offers some utility classes that ease the handling of Alfresco events 
+in the context of a Spring Integration application.  
 
 This component is defined in the module [alfresco-java-event-api-integration](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-integration){:target="_blank"}. 
 
-It makes use of the event handling library and the event model to offer integration features making the assumption that the integrator is working on the context 
-of a Spring Integration project. 
+It makes use of the event handling library and the event model to offer integration features making the assumption that 
+the integrator is working in the context of a Spring Integration project. 
 
-The way the events are consumed from the ActiveMQ topic where the Events API is currently publishing them is not specified at this level of integration, and it 
-is intentionally left open to the integrator's choice. For a more opinionated integration level please take a look to the 
-[Spring Boot custom starter section](#spring-boot-custom-starter).
+The way the events are consumed from the ActiveMQ topic where the Alfresco event system is currently publishing them is 
+not specified at this level of integration, and it is intentionally left open to the developer's choice. For a more 
+opinionated integration level please take a look to the [Spring Boot custom starter section](#springbootcustomstarter).
 
-Once the JSON events are ingested in a Spring Integration channel, this library offers a transformer to translate from the JSON schema defined by the Event Model
-to the Java POJO classes defined in it (i.e. `RepoEvent`).
+Once the JSON events are ingested in a Spring Integration channel, this library offers a transformer to translate from 
+the JSON schema defined by the Alfresco Event Model to the Java POJO classes defined in it (i.e. `RepoEvent`).
 
 Apart from that, this module offers a wrapper of the [`EventFilter`](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-handling/src/main/java/org/alfresco/event/sdk/handling/filter/EventFilter.java){:target="_blank"}
-interface as a Spring Integration filter (`GenericSelector`) to be able to use all the filter offering of the handling library in a Spring Integration
-context easily.
+interface as a Spring Integration filter (`GenericSelector`) to be able to easily use all the filter offering of the handling 
+library in a Spring Integration context.
 
-### Spring Boot Custom Starter
+### Spring Boot Custom Starter {#springbootcustomstarter}
 
-The Spring Boot custom starter component defines a personalized Spring Boot starter to automatically configure all the beans and properties defaults to 
-implement a client of the Alfresco Java Event API easily. As should be expected, the use of this component makes the assumption of creating an integration in 
-the context of a Spring Boot application.
+The Spring Boot custom starter component defines a personalized Spring Boot starter that will automatically configure 
+all the beans and property defaults for an Alfresco Event system client, making it easy to implement a client for the 
+Alfresco Java Event API. As should be expected, the use of this component makes the assumption that the developer is 
+creating an integration in the context of a Spring Boot application.
 
 This component is defined in the modules [alfresco-java-event-api-spring-boot-autoconfigure](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-spring-boot-autoconfigure){:target="_blank"} and 
 [alfresco-java-event-api-spring-boot-starter](https://github.com/Alfresco/alfresco-java-sdk/tree/develop/alfresco-java-event-api-spring-boot-starter){:target="_blank"}.
@@ -187,15 +208,17 @@ is added to a Spring Boot project.
 
 
 
+### Creating event handler projects
+
+In this section we will see how to use the SDK to create Alfresco event handler projects, using plain Java and 
+using Spring Integration.
+
+#### Java event handlers
 
 
 
+#### Spring Integration event handlers
 
-### Plain Java handlers
-
-
-
-### Spring Integration handlers
  
 
 ## ReST API Java wrapper

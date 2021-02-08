@@ -2,13 +2,13 @@
 title: Alfresco SDK for out-of-process extensions
 ---
 
-Alfresco SDK 5.0 is a Maven based development kit that provides an easy to use approach to developing applications and 
-out-of-process extensions for Alfresco. With this SDK you can develop, package, test, run, document and release your Alfresco extension project.
+Alfresco SDK 5.0 is a development kit that provides an easy to use approach to developing applications and 
+out-of-process extensions for Alfresco. With this SDK you can develop, package, test, run, document and release your 
+Alfresco extension project.
 
 The Alfresco Software Development Kit (Alfresco SDK) is a fundamental tool provided by Alfresco to developers to build 
-customizations and extensions for the Alfresco Digital Business Platform. It is based on [Apache Maven](http://maven.apache.org/){:target="_blank"} 
-and [Docker](https://www.docker.com/){:target="_blank"} and is compatible with major IDEs. This enables Rapid Application Development (RAD) 
-and Test Driven Development (TDD).
+customizations and extensions for the Alfresco Digital Business Platform. It is based on the [Spring Integration](https://spring.io/projects/spring-integration){:target="_blank"} 
+tooling library and [Spring Boot](https://spring.io/projects/spring-boot){:target="_blank"}. 
 
 Alfresco SDK 5.0 is released under [Apache License version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html){:target="_blank"} 
 and supports Content Services both in Community Edition and Enterprise Edition. If you're an Enterprise customer, 
@@ -205,8 +205,6 @@ It is a Spring configuration class that automatically define the beans required 
 
 All this auto-configuration will be enabled as soon as the dependency `org.alfresco:alfresco-java-event-api-spring-boot-starter` 
 is added to a Spring Boot project.
-
-
 
 ### Creating event handler projects
 

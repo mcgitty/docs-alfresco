@@ -2,30 +2,50 @@
 title: Software Architecture
 ---
 
-This gives an introduction to the Content Services architecture from a developer's perspective. At its core is 
-a repository that provides a store for content, and a wide range of services that can be used by content applications 
-to manipulate the content.
+This section gives an introduction to the Content Services architecture from a developer's perspective. 
 
-The following diagram illustrates the three main components that the Content Services consists of. The **Platform**, 
-the User Interface (**UI**), and the **Search** engine. These components are implemented as separate web applications:
+## Overview
+Before we get into details, let's start by looking at Content Services from a high level. Traditionally there has
+always been a few well known components defining Content Services. The following diagram illustrates the three main 
+components that the Content Services consists of. The **Platform**, the User Interface (**UI**), and the **Search** engine. 
+These components are implemented as separate web applications:
+
+TODO: redraw
 
 ![acs_60_architecture_overview]({% link content-services/images/acs_60_architecture_overview.png %})
 
 The main component is called the **Platform** and is implemented in the `alfresco.war` web application. It provides the 
-repository where content is stored plus all the associated content services. Alfresco Share provides a web client 
-interface (that is a User Interface, UI) for the repository and is implemented as the `share.war` web application. 
-Share makes it easy for users to manage their sites, documents, users and so on. The search functionality is implemented 
-on top of Apache **Solr 6** and provides the indexing of all content, which enables powerful search functionality. 
-There are also mobile clients that will access the content via ReST APIs provided by the platform.
+repository where content is stored plus all the associated content services, such as classification and versioning. 
+Traditionally this component is also referred to as the Repository.
 
-Most Content Services projects will implement a domain specific web client based on the Alfresco 
-Application Development Framework (ADF). It gives you full freedom to design a content and process web client 
-supporting exactly the use cases needed by the domain. Giving the end-users the best possible experience.
+Alfresco Share provides a web client interface (that is a User Interface, UI) for the repository and is implemented as 
+the `share.war` web application. There is also a new UI called Digital Workspace, based on the Alfresco Application 
+Development Framework (ADF), we will talk more about this later. Share makes it easy for users to manage their sites, 
+documents, users and so on. 
 
-The Platform and UI components run in the same Apache Tomcat web application server. The Search component runs in its 
-own Jetty web application server. The Platform is usually also integrated with a Directory Server (LDAP) to be able to 
-sync users and groups with Content Services. And most installations also integrates with an SMTP server so the 
-Platform can send emails, such as site invitations.
+The search functionality is implemented on top of Apache **Solr** and provides the indexing of all content, which enables 
+powerful search functionality. There are also mobile clients that will access the content via ReST APIs provided by the platform.
+
+Most Content Services projects will implement a domain specific web client based on ADF. It gives you full freedom to 
+design a content and process web client supporting exactly the use cases needed by the domain. Giving the end-users the 
+best possible experience.
+
+The Platform and UI components run in the same Apache Tomcat web application server, which is Java based. So if you are 
+a Java developer you feel quite at home working with Content Services, even through it is possible to work with 
+other languages when implementing external extensions. 
+
+The Search component runs in its own Jetty web application server. The Platform is usually also integrated with a 
+Directory Server (LDAP) to be able to sync users and groups with Content Services. And most installations also integrates 
+with an SMTP server so the Platform can send emails, such as site invitations.
+
+## Overview
+Now when we got an idea of how the Content Services architecture looks like on a high level, and how it traditionally has 
+always looked like, let's see in more detail how the software architecture for the latest Content Services version looks
+like:
+
+![acs_70_architecture_overview]({% link content-services/images/acs_70_architecture_overview.png %})
+
+TODO
 
 For more information about the internals of the Platform, and specifically the content repository, see the 
 [concepts](TODO_LATER:dev-repository-concepts.md) section.

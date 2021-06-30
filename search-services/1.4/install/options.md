@@ -16,9 +16,12 @@ This task assumes you have:
 * Set the following properties in the `<TOMCAT_HOME>/shared/classes/alfresco-global.properties` file:
 
     ```text
+    # encryption
     index.subsystem.name=solr6
-    solr.secureComms=none
+    solr.secureComms=https
+    solr.host=localhost
     solr.port=8983
+    solr.port.ssl=8983
     ```
 
 > **Important:** Alfresco strongly recommends you use firewalls and other infrastructure means to ensure the Search Services server is not accessible from anything other than trusted hosts and/or users, and only on the ports needed for Search Services.
